@@ -10,7 +10,20 @@ const getAll = async (req, res) => {
 		res.status(400).json({ message: 'Not found employees' });
 	}
 }
-
+// получение конкретного сотрудника
+const getOne = async (req, res) => {
+	const { id } = req.params;
+	try {
+		const employee = await prisma.employee.findUnique({
+			where: {
+				id
+			}
+		});
+		res.status(200).json(employee);
+	} catch (error) {
+		res.status(400).json({ message: 'Not found employee' });
+	}
+}
 // добавление сотрудника
 const add = async (req, res) => {
 	try {
@@ -36,7 +49,43 @@ const add = async (req, res) => {
 	}
 }
 
+// редактирование сотрудника
+const edit = async (req, res) => {
+	const data = req.body;
+	const { id } = req.params;
+	try {
+		await prisma.employee.update({
+			where: {
+				id
+			},
+			data
+		})
+		res.status(200).json({ message: 'Employee edited' });
+	} catch (error) {
+		console.log(error);
+		return res.status(400).json({ message: 'Employee not edited' });
+	}
+}
+
+const remove = async (req, res) => {
+	try {
+		const { id } = req.params;
+		await prisma.employee.delete({
+			where: {
+				id
+			}
+		});
+		res.status(200).json({ message: 'Employee deleted' });
+	} catch (error) {
+		console.log(error);
+		return res.status(400).json({ message: 'Employee not deleted' });
+	}
+}
+
 module.exports = {
 	getAll,
-	add
+	getOne,
+	add,
+	remove,
+	edit
 }
