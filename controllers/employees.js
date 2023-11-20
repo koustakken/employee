@@ -14,25 +14,25 @@ const getAll = async (req, res) => {
 // добавление сотрудника
 const add = async (req, res) => {
 	try {
-		const { firstName, lastName, address, age } = req.body;
+		const data = req.body;
 
-		if (!firstName || !lastName || !address || !age) {
+		if (!data.firstName || !data.lastName || !data.address || !data.age) {
 			return res.status(400).json({ message: 'Fill available fields' });
 		}
+		// костыль для преобразования age в число
+		data.age = parseInt(data.age);
 
 		const employee = await prisma.employee.create({
 			data: {
-				firstName,
-				lastName,
-				address,
-				age,
+				...data,
 				userId: req.user.id
 			}
 		});
 
 		return res.status(200).json(employee);
 	} catch (error) {
-		res.status(400).json({ message: 'Employee not created' });
+		console.log(error);
+		return res.status(400).json({ message: 'Employee not created' });
 	}
 }
 
