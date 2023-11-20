@@ -18,12 +18,22 @@ const login = async (req, res) => {
 	});
 
 	const isMatch = await bcrypt.compare(password, user.password);
+	const secret = process.env.JWT_SECRET;
 
-	if (user && isMatch) {
+	if (user && isMatch && secret) {
 		res.status(200).json({
 			id: user.id,
 			login: user.login,
-			name: user.name
+			name: user.name,
+			token: jwt.sign(
+				{
+					id: user.id
+				},
+				secret,
+				{
+					expiresIn: '24h'
+				}
+			)
 		})
 	} else {
 		res.status(401).json({
@@ -86,7 +96,7 @@ const register = async (req, res) => {
 }
 
 const current = async (req, res) => {
-	res.send('current');
+	return res.status(200).json(req.user);
 }
 
 module.exports = {
